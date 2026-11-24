@@ -123,8 +123,9 @@ fixpc $STATICPC
 
 if ! need xz; then
   src xz-5.2.2 tar.bz2 https://tukaani.org/xz/xz-5.2.2.tar.bz2
-  # liblzma.def.in is a side effect of linking liblzma.la; parallel make races on it -> -j1
-  MAKEFLAGS="-j1" aconf --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-scripts --disable-nls
+  # static-only: avoids xz's Windows liblzma.def/.def.in generation, which races
+  # and is broken with newer libtool. libarchive links liblzma statically.
+  MAKEFLAGS="-j1" aconf --disable-shared --enable-static --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-scripts --disable-nls
   mark xz
 fi
 
