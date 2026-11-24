@@ -1,0 +1,11 @@
+# build artifacts / local outputs
+*.msi
+*.nupkg
+*.zip
+*.tar.gz
+build/
+.ci/
+
+# OS junk
+.DS_Store
+Thumbs.db

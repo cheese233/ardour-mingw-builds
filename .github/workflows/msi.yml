@@ -1,0 +1,163 @@
+name: ardour-win64-msi
+
+# Cross-compiles Ardour for Windows x64 with mingw-w64 directly on the GitHub
+# runner (no Docker, no Windows runner), builds a Windows Installer (.msi) with
+# wixl/msitools, and attaches it to a GitHub Release.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release / MSI version (e.g. 9.10.0)"
+        required: true
+        default: "9.10.0"
+      publish:
+        description: "Create/update a GitHub Release with the .msi"
+        type: boolean
+        default: true
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ardour-win64-msi-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  ROOT: /mnt/ci
+
+jobs:
+  build:
+    name: Build Ardour + MSI (ubuntu-22.04)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 350
+    steps:
+      - name: Resolve version
+        run: |
+          v="${{ inputs.version }}"
+          if [ -z "$v" ] && [ "${GITHUB_REF_NAME#v}" != "$GITHUB_REF_NAME" ]; then
+            v="${GITHUB_REF_NAME#v}"
+          fi
+          [ -n "$v" ] || v="9.10.0"
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+          echo "Using version $v"
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+                      /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true
+          sudo apt-get clean
+          df -h /
+
+      - name: Prepare build root
+        run: |
+          sudo mkdir -p "$ROOT"
+          sudo chown -R "$(id -u):$(id -g)" "$ROOT"
+          df -h /mnt || df -h "$ROOT"
+
+      - name: Checkout (Ardour as submodule)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install toolchain
+        run: bash ci/00-setup.sh
+
+      - name: Ardour submodule revision
+        id: src
+        run: echo "sha=$(git -C ardour rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.ROOT }}/ccache
+          key: ccache-${{ runner.os }}-${{ hashFiles('ci/**') }}
+          restore-keys: |
+            ccache-${{ runner.os }}-
+
+      - name: Cache Ardour build tree
+        uses: actions/cache@v4
+        with:
+          path: ardour/build
+          key: ardour-build-${{ steps.src.outputs.sha }}-${{ hashFiles('ci/**') }}
+          restore-keys: |
+            ardour-build-${{ steps.src.outputs.sha }}-
+
+      - name: Configure ccache
+        run: |
+          export CCACHE_DIR="$ROOT/ccache"
+          ccache -M 2G
+          ccache -z || true
+
+      - name: Cache dependency stack
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.ROOT }}/win-stack-w64
+            ${{ env.ROOT }}/winsrc
+          key: winstack-${{ runner.os }}-${{ hashFiles('ci/**') }}
+          restore-keys: |
+            winstack-${{ runner.os }}-
+
+      - name: Build dependency stack
+        run: bash ci/10-stack.sh
+
+      - name: Dependency fixups (liblo/vamp/curl, gtkmm, LRDF)
+        run: |
+          bash ci/11-fixups.sh
+          bash ci/13-gtkmm-dlls.sh
+          bash ci/14-cairomm-pangomm.sh
+          bash ci/15-lrdf.sh
+
+      - name: Rebuild cairo chain + pango as real DLLs
+        run: |
+          bash ci/20-cairo-dllchain.sh
+          bash ci/21-pango-dll.sh
+
+      - name: Build PortAudio with WASAPI
+        run: bash ci/30-portaudio-wasapi.sh
+
+      - name: Build Ardour
+        run: bash ci/40-ardour.sh
+
+      - name: Bundle
+        run: bash ci/50-bundle.sh
+
+      - name: Build MSI
+        run: bash ci/60-msi.sh
+
+      - name: ccache statistics
+        if: always()
+        run: |
+          export CCACHE_DIR="$ROOT/ccache"
+          ccache -s || true
+
+      - name: Stage MSI for upload
+        run: cp "$ROOT"/ardour-*-x64.msi "$GITHUB_WORKSPACE/"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ardour-msi
+          path: ardour-*-x64.msi
+          retention-days: 14
+
+      - name: Publish GitHub Release
+        if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.publish == true }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ github.ref_name }}"
+          case "$tag" in
+            ""|main|master) tag="v$VERSION" ;;
+          esac
+          msi="$GITHUB_WORKSPACE/ardour-$VERSION-x64.msi"
+          ls -l "$msi"
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --title "Ardour $VERSION" \
+              --target "$GITHUB_SHA" --generate-notes
+          fi
+          gh release upload "$tag" "$msi" --clobber

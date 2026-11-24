@@ -1,0 +1,19 @@
+diff --git a/libs/ptformat/wscript b/libs/ptformat/wscript
+index 4dbd5b3..d36dc1b 100644
+--- a/libs/ptformat/wscript
++++ b/libs/ptformat/wscript
+@@ -23,7 +23,7 @@ def build(bld):
+         obj = bld.shlib (features = 'cxx cxxshlib', source = [ 'ptformat.cc' ])
+         obj.defines = [ 'LIBPTFORMAT_DLL_EXPORTS=1' ]
+     else:
+-        obj = bld.stdlib (source = [ 'ptformat.cc' ])
++        obj = bld.stlib (source = [ 'ptformat.cc' ])
+         obj.cxxflags = [ bld.env['compiler_flags_dict']['pic'] ]
+         obj.cflags   = [ bld.env['compiler_flags_dict']['pic'] ]
+ 
+@@ -35,4 +35,4 @@ def build(bld):
+     obj.uselib       = 'GLIBMM'
+     obj.vnum         = LIBPTFORMAT_LIB_VERSION
+     obj.install_path = bld.env['LIBDIR']
+-    obj.defines     += [ 'PACKAGE="' + I18N_PACKAGE + '"' ]
++    obj.defines = getattr(obj, 'defines', []) + [ 'PACKAGE="' + I18N_PACKAGE + '"' ]

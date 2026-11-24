@@ -1,0 +1,34 @@
+diff --git a/gtk2_ardour/engine_dialog.cc b/gtk2_ardour/engine_dialog.cc
+index ec545a5..3cc35a4 100644
+--- a/gtk2_ardour/engine_dialog.cc
++++ b/gtk2_ardour/engine_dialog.cc
+@@ -1203,7 +1203,14 @@ EngineControl::set_device_popdown_strings ()
+ 	vector<string> available_devices;
+ 
+ 	for (vector<ARDOUR::AudioBackend::DeviceStatus>::const_iterator i = all_devices.begin (); i != all_devices.end (); ++i) {
+-		available_devices.push_back (i->name);
++		std::string nm = i->name;
++		if (nm.empty ()) { continue; }
++		if (!g_utf8_validate (nm.c_str (), -1, NULL)) {
++			gchar *v = g_utf8_make_valid (nm.c_str (), -1);
++			nm = v;
++			g_free (v);
++		}
++		available_devices.push_back (nm);
+ 	}
+ 
+ 	if (available_devices.empty ()) {
+@@ -1218,7 +1225,12 @@ EngineControl::set_device_popdown_strings ()
+ 	DEBUG_ECONTROL (
+ 	    string_compose ("set device_combo active text: %1", default_device));
+ 
+-	device_combo.set_active_text (default_device);
++	if (default_device.empty () && !available_devices.empty ()) {
++		default_device = available_devices.front ();
++	}
++	if (!default_device.empty ()) {
++		device_combo.set_active_text (default_device);
++	}
+ 	return true;
+ }
+ 

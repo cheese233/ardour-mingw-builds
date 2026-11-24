@@ -1,0 +1,83 @@
+diff --git a/libs/backends/portaudio/portaudio_backend.cc b/libs/backends/portaudio/portaudio_backend.cc
+index 554f39a..732b4df 100644
+--- a/libs/backends/portaudio/portaudio_backend.cc
++++ b/libs/backends/portaudio/portaudio_backend.cc
+@@ -60,6 +60,20 @@
+ 
+ using namespace ARDOUR;
+ 
++static std::string
++pa_safe_utf8 (const std::string& s)
++{
++	if (s.empty ()) { return s; }
++	if (g_utf8_validate (s.c_str (), -1, NULL)) { return s; }
++	try {
++		return Glib::locale_to_utf8 (s);
++	} catch (...) {
++		return s;
++	}
++}
++
++
++
+ namespace {
+ 
+ const char * const winmme_driver_name = X_("WinMME");
+@@ -1206,7 +1220,7 @@ PortAudioBackend::register_system_audio_ports()
+ 		if (!p) return -1;
+ 		set_latency_range (p, false, lr);
+ 		std::shared_ptr<PortAudioPort> audio_port = std::dynamic_pointer_cast<PortAudioPort>(p);
+-		audio_port->set_hw_port_name (Glib::locale_to_utf8 (_pcmio->get_input_channel_name (name_to_id (_input_audio_device), i)));
++		audio_port->set_hw_port_name (pa_safe_utf8 (_pcmio->get_input_channel_name (name_to_id (_input_audio_device), i)));
+ 		_system_inputs.push_back (audio_port);
+ 	}
+ 
+@@ -1218,7 +1232,7 @@ PortAudioBackend::register_system_audio_ports()
+ 		if (!p) return -1;
+ 		set_latency_range (p, true, lr);
+ 		std::shared_ptr<PortAudioPort> audio_port = std::dynamic_pointer_cast<PortAudioPort>(p);
+-		audio_port->set_hw_port_name (Glib::locale_to_utf8 (_pcmio->get_output_channel_name (name_to_id (_output_audio_device), i)));
++		audio_port->set_hw_port_name (pa_safe_utf8 (_pcmio->get_output_channel_name (name_to_id (_output_audio_device), i)));
+ 		_system_outputs.push_back(audio_port);
+ 	}
+ 	return 0;
+diff --git a/libs/backends/portaudio/portaudio_io.cc b/libs/backends/portaudio/portaudio_io.cc
+index d2d6ac4..7530a49 100644
+--- a/libs/backends/portaudio/portaudio_io.cc
++++ b/libs/backends/portaudio/portaudio_io.cc
+@@ -317,13 +317,25 @@ PortAudioIO::available_buffer_sizes(int device_id, std::vector<uint32_t>& buffer
+ 	return 0;
+ }
+ 
++static std::string
++pa_safe_utf8 (const std::string& s)
++{
++	if (s.empty ()) { return s; }
++	if (g_utf8_validate (s.c_str (), -1, NULL)) { return s; }
++	try {
++		return Glib::locale_to_utf8 (s);
++	} catch (...) {
++		return s;
++	}
++}
++
+ void
+ PortAudioIO::input_device_list(std::map<int, std::string> &devices) const
+ {
+ 	for (std::map<int, paDevice*>::const_iterator i = _input_devices.begin ();
+ 	     i != _input_devices.end ();
+ 	     ++i) {
+-		devices.insert (std::pair<int, std::string>(i->first, Glib::locale_to_utf8(i->second->name)));
++		devices.insert (std::pair<int, std::string>(i->first, pa_safe_utf8(i->second->name)));
+ 	}
+ }
+ 
+@@ -333,7 +345,7 @@ PortAudioIO::output_device_list(std::map<int, std::string> &devices) const
+ 	for (std::map<int, paDevice*>::const_iterator i = _output_devices.begin ();
+ 	     i != _output_devices.end ();
+ 	     ++i) {
+-		devices.insert (std::pair<int, std::string>(i->first, Glib::locale_to_utf8(i->second->name)));
++		devices.insert (std::pair<int, std::string>(i->first, pa_safe_utf8(i->second->name)));
+ 	}
+ }
+ 

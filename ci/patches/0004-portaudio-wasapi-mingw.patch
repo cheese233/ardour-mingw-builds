@@ -1,0 +1,24 @@
+--- a/src/hostapi/wasapi/pa_win_wasapi.c
++++ b/src/hostapi/wasapi/pa_win_wasapi.c
+@@ -48,7 +48,20 @@
+ #include <process.h>
+ #include <assert.h>
+ #include <mmsystem.h>
+-#include <mmreg.h>  // must be before other Wasapi headers
++#include <mmreg.h>  // must be before other Wasapi headers
++#if !defined(_MSC_VER)
++#define COBJMACROS
++#include <objbase.h>
++#define INITGUID
++#include <initguid.h>
++#include <audioclient.h>
++#include <endpointvolume.h>
++#include <mmdeviceapi.h>
++#include <functiondiscoverykeys_devpkey.h>
++#include <devicetopology.h>
++#include <avrt.h>
++#endif
++
+ #if defined(_MSC_VER) && (_MSC_VER >= 1400)
+ 	#include <Avrt.h>
+ 	#define COBJMACROS
