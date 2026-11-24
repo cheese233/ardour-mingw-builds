@@ -41,7 +41,7 @@ export DLLTOOL=${XPREFIX}-dlltool
 
 CFLAGS="-mstackrealign -O2" \
 CXXFLAGS="-mstackrealign -O2" \
-LDFLAGS="-L${PREFIX}/lib -Wl,--export-all-symbols -Wl,--allow-multiple-definition -liphlpapi" \
+LDFLAGS="-L${PREFIX}/lib -Wl,--export-all-symbols -Wl,--allow-multiple-definition -liphlpapi -lssp" \
 DEPSTACK_ROOT="$PREFIX" \
 ./waf configure \
   --keepflags \

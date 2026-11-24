@@ -31,7 +31,6 @@ aconf(){
   CFLAGS="-I$PREFIX/include $STACKCFLAGS -mstackrealign $CFLAGS" \
   CXXFLAGS="-I$PREFIX/include $STACKCFLAGS -std=gnu++11 -mstackrealign $CXXFLAGS" \
   LDFLAGS="-L$PREFIX/lib $LDFLAGS" \
-  LIBS="-lssp $LIBS" \
   ./configure --host=$XPREFIX --build=${HPREFIX}-linux --prefix=$PREFIX "$@"
   make $MAKEFLAGS && make install
 }
@@ -207,6 +206,9 @@ fi
 
 if ! need flac; then
   src flac-1.3.2 tar.xz https://downloads.xiph.org/releases/flac/flac-1.3.2.tar.xz
+  # flac forces -D_FORTIFY_SOURCE=2 which produces __*_chk refs needing libssp;
+  # strip it so no ssp dependency leaks into the static archive.
+  sed -i 's/-D_FORTIFY_SOURCE=2//g' configure || true
   aconf --disable-examples --disable-docs --disable-oggtest --disable-static --without-xmms --disable-cpplibs
   mark flac
 fi
@@ -268,7 +270,6 @@ if ! need fontconfig; then
   sed -i 's/po-conf test/po-conf/' Makefile.in || true
   CPPFLAGS="-I$PREFIX/include" CFLAGS="-I$PREFIX/include $STACKCFLAGS -mstackrealign" \
   CXXFLAGS="-I$PREFIX/include $STACKCFLAGS -mstackrealign" LDFLAGS="-L$PREFIX/lib" \
-  LIBS="-lssp" \
   ./configure --host=$XPREFIX --build=${HPREFIX}-linux --prefix=$PREFIX --enable-libxml2 --disable-docs
   make $MAKEFLAGS
   make install || true
@@ -505,7 +506,6 @@ if ! need curl; then
   src curl-7.66.0 tar.gz https://curl.se/download/curl-7.66.0.tar.gz
   CPPFLAGS="-I$PREFIX/include" CFLAGS="-I$PREFIX/include $STACKCFLAGS -mstackrealign" \
   CXXFLAGS="-I$PREFIX/include $STACKCFLAGS -std=gnu++11 -mstackrealign" LDFLAGS="-L$PREFIX/lib" \
-  LIBS="-lssp" \
   ./configure --host=$XPREFIX --build=${HPREFIX}-linux --prefix=$PREFIX \
     --with-winssl --disable-ldap --disable-shared --enable-static \
     --without-libidn2 --without-nghttp2 --without-librtmp --without-libssh2 --without-zstd --without-brotli

@@ -38,7 +38,7 @@ cd "$BUILDD"; rm -rf vamp-plugin-sdk-2.9.0; mkdir vamp-plugin-sdk-2.9.0
 tar xf "$SRCDIR/vamp-plugin-sdk-2.9.0.tar.gz" -C vamp-plugin-sdk-2.9.0 --strip-components=1
 cd vamp-plugin-sdk-2.9.0
 { echo '#ifndef M_PI'; echo '# define M_PI 3.14159265358979323846'; echo '#endif'; cat src/vamp-hostsdk/Window.h; } > /tmp/wh && mv /tmp/wh src/vamp-hostsdk/Window.h
-CPPFLAGS="-I$PREFIX/include" CFLAGS="$CF" CXXFLAGS="$CX" LDFLAGS="$LD" LIBS="-lssp" \
+CPPFLAGS="-I$PREFIX/include" CFLAGS="$CF" CXXFLAGS="$CX" LDFLAGS="$LD" \
   ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX
 ln -sf vamp-simple-host.exe host/vamp-simple-host
 ln -sf vamp-rdf-template-generator.exe rdf/generator/vamp-rdf-template-generator

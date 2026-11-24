@@ -8,7 +8,7 @@ cd "$BUILDD"; rm -rf LRDF-0.5.3-rg; mkdir LRDF-0.5.3-rg
 tar xf "$SRCDIR/LRDF-0.5.3-rg.tar.gz" -C LRDF-0.5.3-rg --strip-components=1
 cd LRDF-0.5.3-rg
 if [ -x ./autogen.sh ]; then ./autogen.sh; else autoreconf -fi; fi
-CPPFLAGS="-DRAPTOR_STATIC -I$PREFIX/include" CFLAGS="$CF" LDFLAGS="-L$PREFIX/lib" LIBS="-lssp" \
+CPPFLAGS="-DRAPTOR_STATIC -I$PREFIX/include" CFLAGS="$CF" LDFLAGS="-L$PREFIX/lib" \
   ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-shared --enable-static
 make -j$(nproc) && make install
 cat > "$PREFIX/lib/pkgconfig/lrdf.pc" <<EOF
