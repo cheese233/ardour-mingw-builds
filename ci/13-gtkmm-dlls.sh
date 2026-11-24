@@ -20,7 +20,18 @@ build(){
 
 build glibmm-2.62.0 tar.xz
 build cairomm-1.13.1 tar.gz
-build pangomm-2.42.0 tar.xz
+
+# pangomm: build only the library subdir (skip the X11-linked docs helper)
+cd "$BUILDD"; rm -rf pangomm-2.42.0; mkdir pangomm-2.42.0
+tar xf "$SRCDIR/pangomm-2.42.0.tar.xz" -C pangomm-2.42.0 --strip-components=1
+cd pangomm-2.42.0
+CPPFLAGS="-I$PREFIX/include" CFLAGS="$CF" CXXFLAGS="$CX" LDFLAGS="-L$PREFIX/lib" \
+  ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-static --disable-documentation
+sed -i 's/^allow_undefined_flag=.*/allow_undefined_flag=""/' libtool
+printf 'all:\ninstall:\nclean:\n' > tools/Makefile
+make -C pango/pangomm LDFLAGS="-L$PREFIX/lib -no-undefined" -j$(nproc)
+make -C pango/pangomm install LDFLAGS="-L$PREFIX/lib -no-undefined"
+mkdir -p "$PREFIX/lib/pkgconfig"; cp -f pango/pangomm-1.4.pc "$PREFIX/lib/pkgconfig/" 2>/dev/null || true
 
 # remove stale static archives so the linker prefers the import libs
 rm -f "$PREFIX"/lib/libglibmm-2.4.a "$PREFIX"/lib/libcairomm-1.0.a "$PREFIX"/lib/libpangomm-1.4.a
