@@ -22,7 +22,7 @@ fi
 
 need(){ test -f "$PREFIX/.stamp/$1"; }
 mark(){ touch "$PREFIX/.stamp/$1"; echo "##### DONE $1 $(date +%H:%M:%S)"; }
-download(){ local f=$1 url=$2; if [ ! -f "$SRCDIR/$f" ]; then echo "--- download $f"; curl -k -L --retry 3 --connect-timeout 30 -o "$SRCDIR/$f" "$url"; fi }
+download(){ local f=$1 url=$2; if [ ! -s "$SRCDIR/$f" ]; then echo "--- download $f"; rm -f "$SRCDIR/$f"; curl -fSLsS --retry 8 --retry-delay 3 --retry-all-errors --connect-timeout 30 -o "$SRCDIR/$f" "$url" || { echo "ERROR downloading $url"; rm -f "$SRCDIR/$f"; return 1; }; fi }
 src(){ local name=$1 ext=$2 url=$3; download "$name.$ext" "$url"; rm -rf "$BUILDD/$name"; mkdir -p "$BUILDD/$name"; tar xf "$SRCDIR/$name.$ext" -C "$BUILDD/$name" --strip-components=1; cd "$BUILDD/$name"; }
 
 aconf(){
