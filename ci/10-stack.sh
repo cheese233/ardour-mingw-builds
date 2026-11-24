@@ -524,6 +524,7 @@ if ! need curl; then
     --without-libidn2 --without-nghttp2 --without-librtmp --without-libssh2 --without-zstd --without-brotli
   make -C include install
   make -C lib $MAKEFLAGS && make -C lib install
+  mkdir -p "$PREFIX/lib/pkgconfig"; cp -f libcurl.pc "$PREFIX/lib/pkgconfig/" 2>/dev/null || true
   mark curl
 fi
 
