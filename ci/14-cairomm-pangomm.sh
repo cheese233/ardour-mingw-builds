@@ -12,7 +12,7 @@ build(){
   tar xf "$SRCDIR/$name.$ext" -C "$name" --strip-components=1
   cd "$name"
   CPPFLAGS="-I$PREFIX/include" CFLAGS="$CF" CXXFLAGS="$CX" LDFLAGS="-L$PREFIX/lib" \
-    ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-documentation
+    ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-shared --enable-static --disable-documentation
   sed -i 's/^allow_undefined_flag=.*/allow_undefined_flag=""/' libtool
   if [ "$name" = "pangomm-2.42.0" ]; then
     # skip the X11-linked docs helper; only the library is needed
@@ -30,7 +30,7 @@ cd "$BUILDD"; rm -rf pangomm-2.42.0; mkdir pangomm-2.42.0
 tar xf "$SRCDIR/pangomm-2.42.0.tar.xz" -C pangomm-2.42.0 --strip-components=1
 cd pangomm-2.42.0
 CPPFLAGS="-I$PREFIX/include" CFLAGS="$CF" CXXFLAGS="$CX" LDFLAGS="-L$PREFIX/lib" \
-  ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-documentation
+  ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-shared --enable-static --disable-documentation
 sed -i 's/^allow_undefined_flag=.*/allow_undefined_flag=""/' libtool
 printf 'all:\ninstall:\nclean:\n' > tools/Makefile
 make -C pango/pangomm -j$(nproc)

@@ -19,22 +19,29 @@ build(){
 }
 
 build glibmm-2.62.0 tar.xz
-build cairomm-1.13.1 tar.gz
+
+# cairomm/pangomm: static libraries (there is no upstream shared build here)
+cd "$BUILDD"; rm -rf cairomm-1.13.1; mkdir cairomm-1.13.1
+tar xf "$SRCDIR/cairomm-1.13.1.tar.gz" -C cairomm-1.13.1 --strip-components=1
+cd cairomm-1.13.1
+CPPFLAGS="-I$PREFIX/include" CFLAGS="$CF" CXXFLAGS="$CX" LDFLAGS="-L$PREFIX/lib" \
+  ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-shared --enable-static --disable-documentation
+make -j$(nproc)
+make install
 
 # pangomm: build only the library subdir (skip the X11-linked docs helper)
 cd "$BUILDD"; rm -rf pangomm-2.42.0; mkdir pangomm-2.42.0
 tar xf "$SRCDIR/pangomm-2.42.0.tar.xz" -C pangomm-2.42.0 --strip-components=1
 cd pangomm-2.42.0
 CPPFLAGS="-I$PREFIX/include" CFLAGS="$CF" CXXFLAGS="$CX" LDFLAGS="-L$PREFIX/lib" \
-  ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-static --disable-documentation
-sed -i 's/^allow_undefined_flag=.*/allow_undefined_flag=""/' libtool
+  ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-shared --enable-static --disable-documentation
 printf 'all:\ninstall:\nclean:\n' > tools/Makefile
-make -C pango/pangomm LDFLAGS="-L$PREFIX/lib -no-undefined" -j$(nproc)
-make -C pango/pangomm install LDFLAGS="-L$PREFIX/lib -no-undefined"
+make -C pango/pangomm -j$(nproc)
+make -C pango/pangomm install
 mkdir -p "$PREFIX/lib/pkgconfig"; cp -f pango/pangomm-1.4.pc "$PREFIX/lib/pkgconfig/" 2>/dev/null || true
 
-# remove stale static archives so the linker prefers the import libs
-rm -f "$PREFIX"/lib/libglibmm-2.4.a "$PREFIX"/lib/libcairomm-1.0.a "$PREFIX"/lib/libpangomm-1.4.a
+# remove only the glibmm static archive (glibmm is shipped as a DLL)
+rm -f "$PREFIX"/lib/libglibmm-2.4.a
 echo "=== final ==="
 ls -l "$PREFIX"/lib/libglibmm* "$PREFIX"/lib/libcairomm* "$PREFIX"/lib/libpangomm* 2>/dev/null
 echo "GTKMM DLLS DONE"
