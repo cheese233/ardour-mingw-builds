@@ -511,7 +511,7 @@ fi
 
 if ! need suil; then
   src suil-0.10.8 tar.bz2 http://ardour.org/files/deps/suil-0.10.8-g05c2afb.tar.bz2
-  wafbuild
+  wafbuild --no-x11 --no-qt --no-cocoa
   mark suil
 fi
 
