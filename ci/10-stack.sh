@@ -123,7 +123,8 @@ fixpc $STATICPC
 
 if ! need xz; then
   src xz-5.2.2 tar.bz2 https://tukaani.org/xz/xz-5.2.2.tar.bz2
-  aconf --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-scripts --disable-nls
+  # liblzma.def.in is a side effect of linking liblzma.la; parallel make races on it -> -j1
+  MAKEFLAGS="-j1" aconf --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-scripts --disable-nls
   mark xz
 fi
 
