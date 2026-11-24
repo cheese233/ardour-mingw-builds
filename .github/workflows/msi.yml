@@ -106,12 +106,20 @@ jobs:
           path: |
             ${{ env.ROOT }}/win-stack-w64
             ${{ env.ROOT }}/winsrc
-          key: winstack-${{ runner.os }}-${{ hashFiles('ci/**') }}
-          restore-keys: |
-            winstack-${{ runner.os }}-
+          key: winstack2-${{ runner.os }}-${{ hashFiles('ci/10-stack.sh', 'ci/env.sh', 'ci/00-setup.sh') }}
 
       - name: Build dependency stack
         run: bash ci/10-stack.sh
+
+      - name: Save dependency stack
+        if: success()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ env.ROOT }}/win-stack-w64
+            ${{ env.ROOT }}/winsrc
+          key: winstack2-${{ runner.os }}-${{ hashFiles('ci/10-stack.sh', 'ci/env.sh', 'ci/00-setup.sh') }}
 
       - name: Dependency fixups (liblo/vamp/curl, gtkmm, LRDF)
         run: |

@@ -343,8 +343,8 @@ if ! need pangomm; then
   LDFLAGS="-L$PREFIX/lib" \
   ./configure --host=$XPREFIX --build=${HPREFIX}-linux --prefix=$PREFIX --disable-static --disable-documentation
   # the docs helper (tools/extra_defs_gen) links X11 libs; build only the library
-  printf 'all:\ninstall:\nclean:\n' > tools/Makefile
-  make $MAKEFLAGS && make install
+  make -C pango/pangomm $MAKEFLAGS && make -C pango/pangomm install
+  mkdir -p "$PREFIX/lib/pkgconfig"; cp -f pango/pangomm-1.4.pc "$PREFIX/lib/pkgconfig/" 2>/dev/null || true
   mark pangomm
 fi
 

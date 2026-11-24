@@ -33,8 +33,9 @@ CPPFLAGS="-I$PREFIX/include" CFLAGS="$CF" CXXFLAGS="$CX" LDFLAGS="-L$PREFIX/lib"
   ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-documentation
 sed -i 's/^allow_undefined_flag=.*/allow_undefined_flag=""/' libtool
 printf 'all:\ninstall:\nclean:\n' > tools/Makefile
-make -j$(nproc)
-make install
+make -C pango/pangomm -j$(nproc)
+make -C pango/pangomm install
+mkdir -p "$PREFIX/lib/pkgconfig"; cp -f pango/pangomm-1.4.pc "$PREFIX/lib/pkgconfig/" 2>/dev/null || true
 echo "=== prefix ==="
 ls -l "$PREFIX"/lib/libcairomm* "$PREFIX"/lib/libpangomm* 2>/dev/null
 echo "CAIROMM/PANGOMM DONE"
