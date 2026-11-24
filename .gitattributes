@@ -6,3 +6,5 @@
 *.patch  text eol=lf
 *.path   text eol=lf
 .gitmodules text eol=lf
+ci/vendor/*.tar.gz binary
+ci/vendor/*.gz binary

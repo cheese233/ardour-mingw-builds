@@ -22,7 +22,7 @@ fi
 
 need(){ test -f "$PREFIX/.stamp/$1"; }
 mark(){ touch "$PREFIX/.stamp/$1"; echo "##### DONE $1 $(date +%H:%M:%S)"; }
-download(){ local f=$1 url=$2; if [ ! -s "$SRCDIR/$f" ]; then echo "--- download $f"; rm -f "$SRCDIR/$f"; curl -fSLsS --retry 8 --retry-delay 3 --retry-all-errors --connect-timeout 30 -o "$SRCDIR/$f" "$url" || { echo "ERROR downloading $url"; rm -f "$SRCDIR/$f"; return 1; }; fi }
+download(){ local f=$1 url=$2; if [ ! -s "$SRCDIR/$f" ]; then echo "--- download $f"; rm -f "$SRCDIR/$f"; if [ -f "$CI_DIR/vendor/$f" ]; then echo "using vendored $f"; cp -f "$CI_DIR/vendor/$f" "$SRCDIR/$f"; else curl -fSLsS --retry 8 --retry-delay 3 --retry-all-errors --connect-timeout 30 -o "$SRCDIR/$f" "$url" || { echo "ERROR downloading $url"; rm -f "$SRCDIR/$f"; return 1; }; fi; fi }
 src(){ local name=$1 ext=$2 url=$3; download "$name.$ext" "$url"; rm -rf "$BUILDD/$name"; mkdir -p "$BUILDD/$name"; tar xf "$SRCDIR/$name.$ext" -C "$BUILDD/$name" --strip-components=1; cd "$BUILDD/$name"; }
 
 aconf(){
