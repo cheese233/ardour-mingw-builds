@@ -39,6 +39,7 @@ printf 'all:\ninstall:\nclean:\n' > tools/Makefile
 make -C pango/pangomm -j$(nproc)
 make -C pango/pangomm install
 mkdir -p "$PREFIX/lib/pangomm-1.4/include"; cp -f pango/pangommconfig.h "$PREFIX/lib/pangomm-1.4/include/" 2>/dev/null || true
+mkdir -p "$PREFIX/include/pangomm-1.4"; cp -f pango/pangomm.h "$PREFIX/include/pangomm-1.4/" 2>/dev/null || true
 mkdir -p "$PREFIX/lib/pkgconfig"; cp -f pango/pangomm-1.4.pc "$PREFIX/lib/pkgconfig/" 2>/dev/null || true
 
 # remove only the glibmm static archive (glibmm is shipped as a DLL)
