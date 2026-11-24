@@ -437,7 +437,13 @@ fi
 if ! need aubio; then
   src aubio-0.3.2 tar.gz https://aubio.org/pub/aubio-0.3.2.tar.gz
   sed -i 's/examples / /' Makefile.in || true
-  aconf --enable-fftw3
+  CPPFLAGS="-I$PREFIX/include $CPPFLAGS" \
+  CFLAGS="-I$PREFIX/include $STACKCFLAGS -mstackrealign" \
+  LDFLAGS="-L$PREFIX/lib" \
+  ./configure --host=$XPREFIX --build=${HPREFIX}-linux --prefix=$PREFIX --enable-fftw3
+  # no Python.h for mingw: build only the library, skip python/swig/docs/plugins
+  sed -i 's/^SUBDIRS = .*/SUBDIRS = src ext/' Makefile
+  make $MAKEFLAGS && make install
   sed -i 's/ -laubio/ -laubio -lfftw3f/' $PREFIX/lib/pkgconfig/aubio.pc 2>/dev/null || true
   mark aubio
 fi
