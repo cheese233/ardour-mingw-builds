@@ -249,7 +249,7 @@ fi
 
 if ! need glib; then
   src glib-2.64.6 tar.xz https://download.gnome.org/sources/glib/2.64/glib-2.64.6.tar.xz
-  mesonbuild -Dinternal_pcre=true -Dselinux=disabled -Dlibmount=disabled -Dtests=false -Dman=false -Dgtk_doc=false
+  mesonbuild -Dinternal_pcre=true -Dselinux=disabled -Dlibmount=disabled -Dman=false -Dgtk_doc=false
   mark glib
 fi
 
@@ -261,7 +261,7 @@ fi
 
 if ! need fribidi; then
   src fribidi-1.0.9 tar.xz https://github.com/fribidi/fribidi/releases/download/v1.0.9/fribidi-1.0.9.tar.xz
-  mesonbuild -Ddocs=false -Dtests=false
+  mesonbuild -Ddocs=false
   mark fribidi
 fi
 
@@ -313,7 +313,7 @@ fi
 if ! need pango; then
   fixpc $STATICPC
   src pango-1.42.4 tar.xz https://download.gnome.org/sources/pango/1.42/pango-1.42.4.tar.xz
-  mesonbuild -Dgir=false -Duse_fontconfig=true
+  mesonbuild -Denable_docs=false -Dgir=false
   mark pango
 fi
 
