@@ -306,7 +306,7 @@ fi
 
 if ! need libarchive; then
   src libarchive-3.6.1 tar.gz https://www.libarchive.org/downloads/libarchive-3.6.1.tar.gz
-  aconf --disable-bsdtar --disable-bsdcat --disable-bsdcpio --without-openssl --without-xml2 --without-expat --disable-static
+  aconf --disable-bsdtar --disable-bsdcat --disable-bsdcpio --without-openssl --without-xml2 --without-expat --disable-shared --enable-static
   mark libarchive
 fi
 
