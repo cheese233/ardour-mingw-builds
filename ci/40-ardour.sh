@@ -35,7 +35,11 @@ if [ ! -f libs/ardour/revision.cc ]; then
     "$REV2" "$(date +%Y-%m-%d)" > libs/ardour/revision.cc
 fi
 
-# --- toolchain --------------------------------------------------------------
+# static libarchive must expose its private deps (iconv etc.) in Libs for waf
+LP="$PREFIX/lib/pkgconfig/libarchive.pc"
+if [ -f "$LP" ] && ! grep -q -- '-liconv' "$LP"; then
+  sed -i 's|^Libs:.*|& -liconv -lcharset -llzma -lz -lbcrypt|' "$LP"
+fi
 export CC=${XPREFIX}-gcc
 export CXX=${XPREFIX}-g++
 export CPP=${XPREFIX}-cpp
