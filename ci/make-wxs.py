@@ -67,12 +67,13 @@ def main():
     def emit(node, relpath, indent):
         pad = "  " * indent
         for f in node["files"]:
-            full = os.path.join(bundle, f.replace("/", os.sep))
+            # wixl wants paths relative to its working directory
+            src = os.path.join(os.path.basename(bundle), f)
             cid = "c_" + uuid.uuid5(NS, "file:" + f).hex[:12]
             fid = "f_" + uuid.uuid5(NS, "fileid:" + f).hex[:12]
             body.append('%s<Component Id="%s" Guid="%s" Win64="yes">' % (pad, cid, gid("file:" + f)))
             body.append('%s  <File Id="%s" Name="%s" Source="%s" KeyPath="yes" />'
-                        % (pad, fid, esc(os.path.basename(f)), esc(full)))
+                        % (pad, fid, esc(os.path.basename(f)), esc(src)))
             body.append('%s</Component>' % pad)
             comps.append(cid)
         for name in sorted(node["dirs"]):

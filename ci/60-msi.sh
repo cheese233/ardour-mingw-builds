@@ -8,6 +8,8 @@ MSI="$ROOT/ardour-$VERSION-x64.msi"
 WXS="$ROOT/ardour.wxs"
 
 python3 "$CI_DIR/make-wxs.py" "$BUNDLE" "$VERSION" "$WXS"
+# wixl resolves Source paths relative to its cwd; run from the bundle's parent
+cd "$(dirname "$BUNDLE")"
 wixl --arch x64 -v -o "$MSI" "$WXS"
 
 echo "=== MSI summary ==="
