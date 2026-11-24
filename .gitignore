@@ -3,6 +3,7 @@
 *.nupkg
 *.zip
 *.tar.gz
+!ci/vendor/*.tar.gz
 build/
 .ci/
 
