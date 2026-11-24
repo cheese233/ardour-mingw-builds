@@ -5,6 +5,9 @@ source "$(dirname "$0")/env.sh"
 
 CF="-I$PREFIX/include -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -mstackrealign"
 
+# ensure `patch` exists (not part of build-essential)
+command -v patch >/dev/null 2>&1 || sudo apt-get install -y patch
+
 # --- inputs ---------------------------------------------------------------
 [ -f "$SRCDIR/portaudio-svn1963.tgz" ] || \
   curl -k -L --retry 3 -o "$SRCDIR/portaudio-svn1963.tgz" http://ardour.org/files/deps/portaudio-svn1963.tgz
@@ -18,8 +21,13 @@ cd "$BUILDD"; rm -rf portaudio-svn1963; mkdir portaudio-svn1963
 tar xf "$SRCDIR/portaudio-svn1963.tgz" -C portaudio-svn1963 --strip-components=1
 cd portaudio-svn1963
 
-patch -p1 < "$SRCDIR/pa_waves3.diff" || true
-patch -p1 --forward < "$CI_DIR/patches/0004-portaudio-wasapi-mingw.patch" || true
+if patch -p1 -N --dry-run < "$SRCDIR/pa_waves3.diff" >/dev/null 2>&1; then
+  patch -p1 -N < "$SRCDIR/pa_waves3.diff" || true
+fi
+if ! patch -p1 -N --forward < "$CI_DIR/patches/0004-portaudio-wasapi-mingw.patch"; then
+  echo "ERROR: failed to apply WASAPI mingw include patch" >&2
+  exit 1
+fi
 
 sed -i 's/mingw-include//' configure || true
 sed -i 's/_WIN32_WINNT=0x0501/_WIN32_WINNT=0x0600/' configure || true
