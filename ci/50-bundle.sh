@@ -13,8 +13,9 @@ cp -f "$P"/bin/*.dll "$B/lib/ardour9/" 2>/dev/null || true
 cp -f "$P"/lib/*.dll "$B/lib/ardour9/" 2>/dev/null || true
 
 # mingw runtime DLLs (path discovered via the compiler)
-for d in libstdc++-6.dll libgcc_s_seh-1.dll libwinpthread-1.dll; do
+for d in libstdc++-6.dll libgcc_s_seh-1.dll libwinpthread-1.dll libssp-0.dll; do
   src="$(x86_64-w64-mingw32-gcc -print-file-name="$d")"
+  [ -f "$src" ] || src="$MINGW_GCCDIR/$d"
   [ -f "$src" ] && cp -f "$src" "$B/lib/ardour9/" || true
 done
 
