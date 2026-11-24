@@ -16,7 +16,7 @@ build(){
   sed -i 's/^allow_undefined_flag=.*/allow_undefined_flag=""/' libtool
   if [ "$name" = "pangomm-2.42.0" ]; then
     # skip the X11-linked docs helper; only the library is needed
-    sed -i 's/^SUBDIRS = .*/SUBDIRS = pango\/pangomm/' Makefile
+    printf 'all:\ninstall:\nclean:\n' > tools/Makefile
   fi
   make -j$(nproc)
   make install
@@ -32,7 +32,7 @@ cd pangomm-2.42.0
 CPPFLAGS="-I$PREFIX/include" CFLAGS="$CF" CXXFLAGS="$CX" LDFLAGS="-L$PREFIX/lib" \
   ./configure --host=$XPREFIX --build=x86_64-linux --prefix=$PREFIX --disable-documentation
 sed -i 's/^allow_undefined_flag=.*/allow_undefined_flag=""/' libtool
-sed -i 's/^SUBDIRS = .*/SUBDIRS = pango\/pangomm/' Makefile
+printf 'all:\ninstall:\nclean:\n' > tools/Makefile
 make -j$(nproc)
 make install
 echo "=== prefix ==="
