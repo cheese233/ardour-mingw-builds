@@ -337,7 +337,14 @@ fi
 
 if ! need pangomm; then
   src pangomm-2.42.0 tar.xz https://download.gnome.org/sources/pangomm/2.42/pangomm-2.42.0.tar.xz
-  aconf --disable-static --disable-documentation
+  CPPFLAGS="-I$PREFIX/include $CPPFLAGS" \
+  CFLAGS="-I$PREFIX/include $STACKCFLAGS -mstackrealign" \
+  CXXFLAGS="-I$PREFIX/include $STACKCFLAGS -std=gnu++11 -mstackrealign" \
+  LDFLAGS="-L$PREFIX/lib" \
+  ./configure --host=$XPREFIX --build=${HPREFIX}-linux --prefix=$PREFIX --disable-static --disable-documentation
+  # the docs helper (tools/extra_defs_gen) links X11 libs; build only the library
+  sed -i 's/^SUBDIRS = .*/SUBDIRS = pango/' Makefile
+  make $MAKEFLAGS && make install
   mark pangomm
 fi
 
