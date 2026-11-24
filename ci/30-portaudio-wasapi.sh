@@ -24,6 +24,8 @@ cd portaudio-svn1963
 if patch -p1 -N --dry-run < "$SRCDIR/pa_waves3.diff" >/dev/null 2>&1; then
   patch -p1 -N < "$SRCDIR/pa_waves3.diff" || true
 fi
+# the tarball ships CRLF; normalize so our LF diff applies cleanly
+sed -i 's/\r$//' src/hostapi/wasapi/pa_win_wasapi.c
 if ! patch -p1 -N --forward < "$CI_DIR/patches/0004-portaudio-wasapi-mingw.patch"; then
   echo "ERROR: failed to apply WASAPI mingw include patch" >&2
   exit 1
