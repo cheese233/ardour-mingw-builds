@@ -21,7 +21,7 @@ Name: LRDF
 Description: Lightweight RDF library for LADSPA plugins
 Version: 0.5.3
 Libs: -L\${libdir} -llrdf -lraptor2 -lxml2 -lz -liconv -lcharset -lws2_32
-Cflags: -I\${includedir}
+Cflags: -I\${includedir} -I\${includedir}/raptor2
 EOF
 ls -l "$PREFIX/lib/liblrdf.a" "$PREFIX/lib/pkgconfig/lrdf.pc"
 echo "LRDF REBUILT"
