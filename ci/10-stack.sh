@@ -182,7 +182,7 @@ fi
 
 if ! need tiff; then
   src tiff-4.0.3 tar.gz https://download.osgeo.org/libtiff/old/tiff-4.0.3.tar.gz
-  aconf --disable-cxx --disable-static --without-x
+  aconf --disable-cxx --disable-static --disable-lzma --without-x
   mark tiff
 fi
 
