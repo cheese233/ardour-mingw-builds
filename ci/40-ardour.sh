@@ -29,8 +29,10 @@ echo "git describe: $(git describe HEAD)"
 # The submodule's .git is a file, so waf's is_tarball() check is true and it
 # demands libs/ardour/revision.cc (normally generated from git). Provide it.
 if [ ! -f libs/ardour/revision.cc ]; then
+  # tarball-style revision must be MAJOR.MINOR (not MAJOR.MINOR.MICRO)
+  REV2="$(printf '%s' "$VERSION" | cut -d. -f1-2)"
   printf '#include "ardour/revision.h"\nnamespace ARDOUR { const char* revision = "%s"; const char* date = "%s"; }\n' \
-    "$VERSION" "$(date +%Y-%m-%d)" > libs/ardour/revision.cc
+    "$REV2" "$(date +%Y-%m-%d)" > libs/ardour/revision.cc
 fi
 
 # --- toolchain --------------------------------------------------------------
