@@ -27,8 +27,7 @@ sudo apt-get install -y --allow-downgrades --allow-change-held-packages \
   gcc-mingw-w64-base=10.2.1-6+24.2 \
   gcc-mingw-w64-x86-64-posix=10.2.1-6+24.2 \
   gcc-mingw-w64-x86-64-posix-runtime=10.2.1-6+24.2 \
-  g++-mingw-w64-x86-64-posix=10.2.1-6+24.2 \
-  g++-mingw-w64-x86-64-posix-runtime=10.2.1-6+24.2
+  g++-mingw-w64-x86-64-posix=10.2.1-6+24.2
 
 # Prefer the POSIX-threaded mingw compilers (needed for std::mutex & friends).
 sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix 2>/dev/null || true
