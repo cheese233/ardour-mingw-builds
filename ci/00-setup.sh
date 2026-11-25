@@ -13,6 +13,23 @@ sudo apt-get install -y --no-install-recommends \
   xz-utils p7zip-full zip ccache libglib2.0-dev \
   msitools wixl wixl-data
 
+# Ardour's prebuilt Windows JACK (jack_win3264.tar.xz) is built with GCC 10-posix
+# 20210110 (Debian bullseye). Ubuntu 22.04 ships 10-posix 20220113 whose libgcc/SEH
+# exception ABI is incompatible with it: the JACK backend aborts with
+# EXCEPTION_INVALID_DISPOSITION. Install the matching bullseye 10.2.1 toolchain.
+echo "deb http://deb.debian.org/debian bullseye main" | sudo tee /etc/apt/sources.list.d/bullseye-mingw.list >/dev/null
+sudo apt-get update
+sudo apt-get install -y --allow-downgrades --allow-change-held-packages \
+  binutils-mingw-w64-x86-64=2.35.2-2+8.11+b3 \
+  binutils-mingw-w64-i686=2.35.2-2+8.11+b3 \
+  mingw-w64-common=8.0.0-1 \
+  mingw-w64-x86-64-dev=8.0.0-1 \
+  gcc-mingw-w64-base=10.2.1-6+24.2 \
+  gcc-mingw-w64-x86-64-posix=10.2.1-6+24.2 \
+  gcc-mingw-w64-x86-64-posix-runtime=10.2.1-6+24.2 \
+  g++-mingw-w64-x86-64-posix=10.2.1-6+24.2 \
+  g++-mingw-w64-x86-64-posix-runtime=10.2.1-6+24.2
+
 # Prefer the POSIX-threaded mingw compilers (needed for std::mutex & friends).
 sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix 2>/dev/null || true
 sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix 2>/dev/null || true
