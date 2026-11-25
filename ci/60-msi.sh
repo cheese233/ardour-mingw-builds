@@ -14,6 +14,11 @@ if ! ls /usr/local/share/wixl-*/ext/ui/WixUI_InstallDir.wxs >/dev/null 2>&1; the
   [ -d "$src" ] || git clone --depth 1 --recurse-submodules https://github.com/GNOME/msitools.git "$src"
   mkdir -p "$src/subprojects/bats-core/bin"
   ln -sf "$(command -v bats)" "$src/subprojects/bats-core/bin/bats"
+  # Vala 0.56's HashSet.add() returns void; master assumes bool. Drop the checks.
+  sed -i 's/if (!file_ids.add (file.Id))/file_ids.add (file.Id); if (false)/' "$src/tools/wixl/builder.vala"
+  sed -i 's/if (!service_config_ids.add (id))/service_config_ids.add (id); if (false)/' "$src/tools/wixl/builder.vala"
+  sed -i 's/if (!firewall_ids.add (ex.Id))/firewall_ids.add (ex.Id); if (false)/' "$src/tools/wixl/builder.vala"
+  sed -i 's/if (!environment_ids.add (id))/environment_ids.add (id); if (false)/' "$src/tools/wixl/builder.vala"
   ( cd "$src" && PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig \
       PKG_CONFIG_LIBDIR=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig \
       /tmp/wixlvenv/bin/meson setup build --prefix=/usr/local -Dintrospection=true -Dvalidate-wxi=false \
