@@ -14,7 +14,9 @@ if ! ls /usr/local/share/wixl-*/ext/ui/WixUI_InstallDir.wxs >/dev/null 2>&1; the
   [ -d "$src" ] || git clone --depth 1 --recurse-submodules https://github.com/GNOME/msitools.git "$src"
   mkdir -p "$src/subprojects/bats-core/bin"
   ln -sf "$(command -v bats)" "$src/subprojects/bats-core/bin/bats"
-  ( cd "$src" && /tmp/wixlvenv/bin/meson setup build --prefix=/usr/local -Dintrospection=true -Dvalidate-wxi=false \
+  ( cd "$src" && PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig \
+      PKG_CONFIG_LIBDIR=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig \
+      /tmp/wixlvenv/bin/meson setup build --prefix=/usr/local -Dintrospection=true -Dvalidate-wxi=false \
       && ninja -C build && sudo ninja -C build install )
   echo /usr/local/lib/x86_64-linux-gnu | sudo tee /etc/ld.so.conf.d/local-multiarch.conf >/dev/null
   sudo ldconfig
