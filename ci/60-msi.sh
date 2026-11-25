@@ -8,6 +8,9 @@ MSI="$ROOT/ardour-$VERSION-x64.msi"
 WXS="$ROOT/ardour.wxs"
 
 python3 "$CI_DIR/make-wxs.py" "$BUNDLE" "$VERSION" "$WXS"
+# WixUI_InstallDir shows a license page; supply a License.rtf next to the wxs
+LIC="$(find /usr/local/share /usr/share -path '*ext/ui/License.rtf' 2>/dev/null | head -1)"
+if [ -n "$LIC" ]; then cp -f "$LIC" "$(dirname "$BUNDLE")/License.rtf"; fi
 # wixl resolves Source paths relative to its cwd; run from the bundle's parent
 cd "$(dirname "$BUNDLE")"
 wixl --arch x64 -v -o "$MSI" "$WXS"

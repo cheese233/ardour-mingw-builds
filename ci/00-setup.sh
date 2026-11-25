@@ -41,6 +41,20 @@ done
 # Some waf scripts use `python`.
 [ -e /usr/local/bin/python ] || sudo ln -sf "$(command -v python3)" /usr/local/bin/python
 
+# Ubuntu 22.04 ships wixl 0.101 which has no installer UI. Build msitools 0.106
+# from source so we can use WixUI_InstallDir (choose install path dialog).
+sudo apt-get install -y --no-install-recommends valac libgsf-1-dev libgcab-dev libxml2-dev
+_wixl_src="$(mktemp -d)"
+curl -fSL --retry 5 --retry-all-errors -o "$_wixl_src/msitools.tar.gz" \
+  https://github.com/GNOME/msitools/archive/refs/tags/0.106.tar.gz
+tar xf "$_wixl_src/msitools.tar.gz" -C "$_wixl_src"
+( cd "$_wixl_src/msitools-0.106" \
+  && meson setup build --prefix=/usr/local -Dintrospection=false -Dvalidate-wxi=false \
+  && ninja -C build && sudo ninja -C build install )
+rm -rf "$_wixl_src"
+hash -r
+echo "=== wixl ==="; command -v wixl; wixl --version 2>&1 | head -1
+
 echo "=== toolchain ==="
 x86_64-w64-mingw32-gcc --version | head -1
 x86_64-w64-mingw32-g++ --version | head -1
