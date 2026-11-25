@@ -90,7 +90,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ardour/build
-          key: ardour-build3-${{ steps.src.outputs.sha }}-${{ hashFiles('ci/**') }}
+          key: ardour-build3-${{ steps.src.outputs.sha }}-${{ hashFiles('ci/00-setup.sh','ci/10-stack.sh','ci/11-fixups.sh','ci/13-gtkmm-dlls.sh','ci/14-cairomm-pangomm.sh','ci/15-lrdf.sh','ci/20-cairo-dllchain.sh','ci/21-pango-dll.sh','ci/30-portaudio-wasapi.sh','ci/40-ardour.sh','ci/env.sh','ci/patches/**') }}
 
       - name: Configure ccache
         run: |

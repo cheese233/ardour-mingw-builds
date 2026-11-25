@@ -13,7 +13,7 @@ LIC="$(find /usr/local/share /usr/share -path '*ext/ui/License.rtf' 2>/dev/null 
 if [ -n "$LIC" ]; then cp -f "$LIC" "$(dirname "$BUNDLE")/License.rtf"; fi
 # wixl resolves Source paths relative to its cwd; run from the bundle's parent
 cd "$(dirname "$BUNDLE")"
-wixl --arch x64 -v -o "$MSI" "$WXS"
+wixl --arch x64 --ext ui -v -o "$MSI" "$WXS"
 
 echo "=== MSI summary ==="
 msiinfo suminfo "$MSI" 2>/dev/null | grep -iE "Template|Subject|Author|Title" || true
