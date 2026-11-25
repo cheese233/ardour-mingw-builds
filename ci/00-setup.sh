@@ -46,7 +46,7 @@ done
 sudo apt-get install -y --no-install-recommends valac libgsf-1-dev libgcab-dev libxml2-dev
 _wixl_src="$(mktemp -d)"
 curl -fSL --retry 5 --retry-all-errors -o "$_wixl_src/msitools.tar.gz" \
-  https://github.com/GNOME/msitools/archive/refs/tags/0.106.tar.gz
+  https://github.com/GNOME/msitools/archive/refs/tags/v0.106.tar.gz
 tar xf "$_wixl_src/msitools.tar.gz" -C "$_wixl_src"
 ( cd "$_wixl_src/msitools-0.106" \
   && meson setup build --prefix=/usr/local -Dintrospection=false -Dvalidate-wxi=false \
