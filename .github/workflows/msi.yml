@@ -23,7 +23,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: ardour-win64-msi-${{ github.ref }}
+  group: ardour-win64-msi-${{ github.run_id }}
   cancel-in-progress: false
 
 env:
