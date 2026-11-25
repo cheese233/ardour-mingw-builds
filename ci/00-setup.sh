@@ -43,10 +43,10 @@ done
 
 # Ubuntu 22.04 ships wixl 0.101 which has no installer UI. Build msitools 0.106
 # from source so we can use WixUI_InstallDir (choose install path dialog).
-sudo apt-get install -y --no-install-recommends valac libgsf-1-dev libgcab-dev libxml2-dev bats
-python3 -m pip install --user --upgrade "meson>=1.4"
-export PATH="$HOME/.local/bin:$PATH"
-meson --version
+sudo apt-get install -y --no-install-recommends valac libgsf-1-dev libgcab-dev libxml2-dev bats python3-venv
+python3 -m venv /tmp/wixlvenv
+/tmp/wixlvenv/bin/pip install --quiet --upgrade "meson>=1.4"
+/tmp/wixlvenv/bin/meson --version
 _wixl_src="$(mktemp -d)"
 git clone --depth 1 --branch v0.106 --recurse-submodules \
   https://github.com/GNOME/msitools.git "$_wixl_src/msitools"
@@ -54,7 +54,7 @@ git clone --depth 1 --branch v0.106 --recurse-submodules \
 mkdir -p "$_wixl_src/msitools/subprojects/bats-core/bin"
 ln -sf "$(command -v bats)" "$_wixl_src/msitools/subprojects/bats-core/bin/bats"
 ( cd "$_wixl_src/msitools" \
-  && meson setup build --prefix=/usr/local -Dintrospection=false -Dvalidate-wxi=false \
+  && /tmp/wixlvenv/bin/meson setup build --prefix=/usr/local -Dintrospection=false -Dvalidate-wxi=false \
   && ninja -C build && sudo ninja -C build install )
 rm -rf "$_wixl_src"
 hash -r
