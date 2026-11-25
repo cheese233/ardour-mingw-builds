@@ -8,12 +8,22 @@ MSI="$ROOT/ardour-$VERSION-x64.msi"
 WXS="$ROOT/ardour.wxs"
 
 python3 "$CI_DIR/make-wxs.py" "$BUNDLE" "$VERSION" "$WXS"
-# install the WiX UI extension files (data/ext/ui) that meson didn't install
+# Ensure a wixl that supports WixUI_InstallDir (msitools master; v0.106 only has Minimal)
+if ! ls /usr/local/share/wixl-*/ext/ui/WixUI_InstallDir.wxs >/dev/null 2>&1; then
+  src=/tmp/wixl-master
+  [ -d "$src" ] || git clone --depth 1 --recurse-submodules https://github.com/GNOME/msitools.git "$src"
+  mkdir -p "$src/subprojects/bats-core/bin"
+  ln -sf "$(command -v bats)" "$src/subprojects/bats-core/bin/bats"
+  ( cd "$src" && /tmp/wixlvenv/bin/meson setup build --prefix=/usr/local -Dintrospection=true -Dvalidate-wxi=false \
+      && ninja -C build && sudo ninja -C build install )
+  echo /usr/local/lib/x86_64-linux-gnu | sudo tee /etc/ld.so.conf.d/local-multiarch.conf >/dev/null
+  sudo ldconfig
+fi
+# overlay vendored master UI extension files into wixl's data dir
 for d in /usr/local/share/wixl-*; do
   [ -d "$d" ] || continue
-  mkdir -p "$d/ext"
-  rm -rf "$d/ext/ui"
-  cp -a "$CI_DIR/wixl-ext/ui" "$d/ext/ui"
+  sudo mkdir -p "$d/ext/ui"
+  sudo cp -a "$CI_DIR/wixl-ext/ui/." "$d/ext/ui/"
 done
 cp -f "$CI_DIR/wixl-ext/ui/License.rtf" "$(dirname "$BUNDLE")/License.rtf" 2>/dev/null || true
 # wixl resolves Source paths relative to its cwd; run from the bundle's parent

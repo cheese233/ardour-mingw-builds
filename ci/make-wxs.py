@@ -135,6 +135,7 @@ def main():
     xml.append('    </Directory>')
     xml.append('    <UIRef Id="WixUI_InstallDir" />')
     xml.append('    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />')
+    xml.append('    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />')
     xml.append('    <Feature Id="MainFeature" Title="Ardour" Level="1">')
     for c in comps:
         xml.append('      <ComponentRef Id="%s" />' % c)
