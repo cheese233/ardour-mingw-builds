@@ -61,7 +61,7 @@ DEPSTACK_ROOT="$PREFIX" \
   --dist-target=mingw \
   --internal-shared-libs \
   --ptformat \
-  --with-backends=jack,portaudio,dummy \
+  --with-backends=portaudio,dummy \
   --optimize \
   --cxx17 \
   --also-include="${PREFIX}/include" \

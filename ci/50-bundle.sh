@@ -45,6 +45,10 @@ find "$B/lib/ardour9" -maxdepth 2 -type f \
 # VST scanners are only searched for in <dll_dir>/fst
 rm -f "$B/lib/ardour9/ardour-vst-scanner.exe" "$B/lib/ardour9/ardour-vst3-scanner.exe"
 
+# drop the JACK backend/DLLs (not built; avoids a crashing optional backend on Windows)
+rm -f "$B/lib/ardour9/libjack64.dll" "$B/lib/ardour9/libjack.dll" \
+      "$B/lib/ardour9/backends/jack_audiobackend.dll"
+
 tar czf "$B.tar.gz" -C "$(dirname "$B")" "$(basename "$B")"
 echo "=== bundle ==="; du -sh "$B" "$B.tar.gz"
 ls -l "$B/lib/ardour9/libcairo-2.dll" "$B/share/ardour9/default_ui_config"
