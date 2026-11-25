@@ -44,6 +44,9 @@ done
 # Ubuntu 22.04 ships wixl 0.101 which has no installer UI. Build msitools 0.106
 # from source so we can use WixUI_InstallDir (choose install path dialog).
 sudo apt-get install -y --no-install-recommends valac libgsf-1-dev libgcab-dev libxml2-dev
+python3 -m pip install --user --upgrade "meson>=1.4"
+export PATH="$HOME/.local/bin:$PATH"
+meson --version
 _wixl_src="$(mktemp -d)"
 curl -fSL --retry 5 --retry-all-errors -o "$_wixl_src/msitools.tar.gz" \
   https://github.com/GNOME/msitools/archive/refs/tags/v0.106.tar.gz
