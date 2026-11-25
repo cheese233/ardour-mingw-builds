@@ -48,10 +48,9 @@ python3 -m pip install --user --upgrade "meson>=1.4"
 export PATH="$HOME/.local/bin:$PATH"
 meson --version
 _wixl_src="$(mktemp -d)"
-curl -fSL --retry 5 --retry-all-errors -o "$_wixl_src/msitools.tar.gz" \
-  https://github.com/GNOME/msitools/archive/refs/tags/v0.106.tar.gz
-tar xf "$_wixl_src/msitools.tar.gz" -C "$_wixl_src"
-( cd "$_wixl_src/msitools-0.106" \
+git clone --depth 1 --branch v0.106 --recurse-submodules \
+  https://github.com/GNOME/msitools.git "$_wixl_src/msitools"
+( cd "$_wixl_src/msitools" \
   && meson setup build --prefix=/usr/local -Dintrospection=false -Dvalidate-wxi=false \
   && ninja -C build && sudo ninja -C build install )
 rm -rf "$_wixl_src"
