@@ -90,9 +90,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ardour/build
-          key: ardour-build-${{ steps.src.outputs.sha }}-${{ hashFiles('ci/**') }}
-          restore-keys: |
-            ardour-build-${{ steps.src.outputs.sha }}-
+          key: ardour-build3-${{ steps.src.outputs.sha }}-${{ hashFiles('ci/**') }}
 
       - name: Configure ccache
         run: |
