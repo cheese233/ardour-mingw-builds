@@ -54,14 +54,14 @@ export DLLTOOL=${XPREFIX}-dlltool
 
 CFLAGS="-mstackrealign -O2" \
 CXXFLAGS="-mstackrealign -O2" \
-LDFLAGS="-L${PREFIX}/lib -Wl,--export-all-symbols -Wl,--allow-multiple-definition -liphlpapi -lssp" \
+LDFLAGS="-L${PREFIX}/lib -Wl,--export-all-symbols -Wl,--allow-multiple-definition -liphlpapi" \
 DEPSTACK_ROOT="$PREFIX" \
 ./waf configure \
   --keepflags \
   --dist-target=mingw \
   --internal-shared-libs \
   --ptformat \
-  --with-backends=portaudio,dummy \
+  --with-backends=jack,portaudio,dummy \
   --optimize \
   --cxx17 \
   --also-include="${PREFIX}/include" \
