@@ -17,7 +17,7 @@ sudo apt-get install -y --no-install-recommends \
 # 20210110 (Debian bullseye). Ubuntu 22.04 ships 10-posix 20220113 whose libgcc/SEH
 # exception ABI is incompatible with it: the JACK backend aborts with
 # EXCEPTION_INVALID_DISPOSITION. Install the matching bullseye 10.2.1 toolchain.
-echo "deb http://deb.debian.org/debian bullseye main" | sudo tee /etc/apt/sources.list.d/bullseye-mingw.list >/dev/null
+echo "deb [trusted=yes] http://deb.debian.org/debian bullseye main" | sudo tee /etc/apt/sources.list.d/bullseye-mingw.list >/dev/null
 sudo apt-get update
 sudo apt-get install -y --allow-downgrades --allow-change-held-packages \
   binutils-mingw-w64-x86-64=2.35.2-2+8.11+b3 \
