@@ -48,7 +48,11 @@ sed -i 's/ -ldl//' "$PREFIX/lib/pkgconfig/vamp-sdk.pc" 2>/dev/null || true
 ls -l "$PREFIX"/lib/libvamp* "$PREFIX"/lib/pkgconfig/vamp* 2>/dev/null || true
 
 echo "================ CURL PC ================"
-cp -f "$BUILDD/curl-7.66.0/libcurl.pc" "$PREFIX/lib/pkgconfig/" 2>/dev/null || true
+CPC="$PREFIX/lib/pkgconfig/libcurl.pc"
+[ -f "$CPC" ] || cp -f "$BUILDD/curl-7.66.0/libcurl.pc" "$CPC" 2>/dev/null || true
+if [ -f "$CPC" ]; then
+  sed -i 's|^Libs:.*|Libs: -L${libdir} -lcurl -lcrypt32 -lsecur32 -lz -lws2_32 -lbcrypt -ladvapi32|' "$CPC"
+fi
 ls -l "$PREFIX/lib/pkgconfig/libcurl.pc" "$PREFIX/lib/libcurl.a" 2>/dev/null || true
 
 echo "================ VERIFY ================"
