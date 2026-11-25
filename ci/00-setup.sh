@@ -57,9 +57,11 @@ ln -sf "$(command -v bats)" "$_wixl_src/msitools/subprojects/bats-core/bin/bats"
 ( cd "$_wixl_src/msitools" \
   && /tmp/wixlvenv/bin/meson setup build --prefix=/usr/local -Dintrospection=true -Dvalidate-wxi=false \
   && ninja -C build && sudo ninja -C build install )
+echo /usr/local/lib/x86_64-linux-gnu | sudo tee /etc/ld.so.conf.d/local-multiarch.conf >/dev/null
+sudo ldconfig
 rm -rf "$_wixl_src"
 hash -r
-echo "=== wixl ==="; command -v wixl; wixl --version 2>&1 | head -1
+echo "=== wixl ==="; command -v wixl; wixl --version
 
 echo "=== toolchain ==="
 x86_64-w64-mingw32-gcc --version | head -1
