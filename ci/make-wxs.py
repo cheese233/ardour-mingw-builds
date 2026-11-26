@@ -112,7 +112,7 @@ def main():
     ]
     comps.append(sm_comp)
 
-    product_guid = gid("product:" + version)
+    product_guid = "{%s}" % str(uuid.uuid4()).upper()
     xml = []
     xml.append('<?xml version="1.0" encoding="utf-8"?>')
     xml.append('<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">')
@@ -121,6 +121,8 @@ def main():
     xml.append('           Manufacturer="Ardour Project" UpgradeCode="%s">' % UPGRADE_CODE)
     xml.append('    <Package InstallerVersion="500" Compressed="yes" />')
     xml.append('    <Media Id="1" Cabinet="ardour.cab" EmbedCab="yes" />')
+    xml.append('    <MajorUpgrade AllowSameVersionUpgrades="yes" AllowDowngrades="yes" '
+               'DowngradeErrorMessage="A newer version of Ardour is already installed." />')
     xml.append('    <Directory Id="TARGETDIR" Name="SourceDir">')
     xml.append('      <Directory Id="ProgramFiles64Folder">')
     xml.append('        <Directory Id="INSTALLDIR" Name="Ardour">')
